@@ -30,10 +30,10 @@
 #define TOP_RIGHT_CORNER 1
 #define BOT_LEFT_CORNER 2
 #define BOT_RIGHT_CORNER 3
-#define QUANT_LUM0 4
-#define QUANT_LUM1 8
-#define QUANT_LUM2 24
-#define QUANT_LUM3 72
+#define QUANT_LUM0 8//4
+#define QUANT_LUM1 16//12//8
+#define QUANT_LUM2 32//24
+#define QUANT_LUM3 80//72
 
 typedef struct BasicLheBlock {
     uint32_t block_width;

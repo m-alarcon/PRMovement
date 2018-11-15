@@ -4,6 +4,7 @@
 #include "imgutils.h"
 #include "perceptual_relevance_api.h"
 #include "math.h"
+#include "stdio.h"
 
 #define BUFF_SIZE 5
 
@@ -222,6 +223,8 @@ static void lhe_advanced_compute_pr_lum (float **pr_x, float **pr_y, uint8_t *co
             else lum_dif = 4;
             if (lum_dif==0) {
                 pix++;
+                last_lum_dif=lum_dif;
+                last_lum_sign=lum_sign;
                 continue;
             }
 
@@ -270,6 +273,8 @@ static void lhe_advanced_compute_pr_lum (float **pr_x, float **pr_y, uint8_t *co
             else lum_dif = 4;
             if (lum_dif==0) {
                 pix += linesize;
+                last_lum_dif=lum_dif;
+                last_lum_sign=lum_sign;
                 continue;
             }
 
@@ -622,6 +627,9 @@ int main( int argc, char** argv )
 
         pr_to_movement(position);
         float movement = get_image_movement(0);
+
+        fprintf( stderr, "%f\n", movement);
+
         //printf("MOVEMENT: %f frame: %d\n", movement, frameNumber);
 
         create_frame();
