@@ -6,9 +6,8 @@
 #include "math.h"
 #include "stdio.h"
 
-#define BUFF_SIZE 5
-
-int width, height, rgb_channels, linesize;
+//int width, height, rgb_channels, linesize;
+//int buff_size;
 
 void init_pr_computation(int width, int height, int rgb_channels)
 {
@@ -77,9 +76,9 @@ void init_pr_computation(int width, int height, int rgb_channels)
     }
 
     //Buffer circular para guardar las PR de frames anteriores
-    pr_x_buff = malloc(BUFF_SIZE * sizeof(float**));
+    pr_x_buff = malloc(buff_size * sizeof(float**));
     
-    for (int i=0; i < BUFF_SIZE; i++)
+    for (int i=0; i < buff_size; i++)
     {
         pr_x_buff[i] = malloc((total_blocks_height+1) * sizeof(float*));    
         for (int j=0; j<total_blocks_height+1; j++) 
@@ -88,9 +87,9 @@ void init_pr_computation(int width, int height, int rgb_channels)
         }
     }
 
-    pr_y_buff = malloc(BUFF_SIZE * sizeof(float**));
+    pr_y_buff = malloc(buff_size * sizeof(float**));
     
-    for (int i=0; i < BUFF_SIZE; i++)
+    for (int i=0; i < buff_size; i++)
     {
         pr_y_buff[i] = malloc((total_blocks_height+1) * sizeof(float*));    
         for (int j=0; j<total_blocks_height+1; j++) 
@@ -153,14 +152,14 @@ void close_pr_computation()
 
     free (diffs_y);
         
-    for (int i=0; i < BUFF_SIZE; i++)
+    for (int i=0; i < buff_size; i++)
     {    
         free (pr_x_buff[i]);
     }
 
     free (pr_x_buff);
     
-    for (int i=0; i < BUFF_SIZE; i++)
+    for (int i=0; i < buff_size; i++)
     {
         free (pr_y_buff[i]);
     }
@@ -238,7 +237,6 @@ static void lhe_advanced_compute_pr_lum (float **pr_x, float **pr_y, uint8_t *co
             pix++;
         }
     }
-
 
     lum_sign=true;
     lum_dif=0;
@@ -360,7 +358,6 @@ static void lhe_advanced_compute_pr_lum (float **pr_x, float **pr_y, uint8_t *co
  */
 void lhe_advanced_compute_perceptual_relevance (uint8_t *component_original_data_Y, float **pr_x, float **pr_y) 
 {
-    
     uint32_t block_width, block_height, half_block_width, half_block_height;
 
     block_width = theoretical_block_width;
@@ -427,7 +424,7 @@ void pr_to_movement(int image_position_buffer)
     prev_image_position_buffer = image_position_buffer - 1;
 
     if (prev_image_position_buffer < 0)
-        prev_image_position_buffer = BUFF_SIZE - 1;
+        prev_image_position_buffer = buff_size - 1;
 
     //printf("image_position_buffer: %d, prev_image_position_buffer: %d\n", image_position_buffer, prev_image_position_buffer);
 
@@ -547,7 +544,7 @@ void draw_movement_bar(float movement)
 
 }
 
-void create_frame()
+void create_frame(int draw_bar)
 {
 
     float movement_block = 0;
@@ -564,112 +561,10 @@ void create_frame()
             paint_block(block_x, block_y, color);
         }
     }
-    movement = get_image_movement(1);
-    draw_movement_bar(movement);
-
-}
-
-int main( int argc, char** argv )
-{
-    char* imageName = argv[1];
-    char* imageExt = argv[2];
-    char* frameArg = argv[3];
-    int frameNumber;
-    char image[100];
-    int frame = atoi(frameArg);
-    initiated = 0;
-
-    for (frameNumber = 1; frameNumber < frame; frameNumber++){
-
-        if (frameArg == NULL){
-            frameNumber = 0;
-            strcpy(image, imageName);
-            strcat(image, imageExt);
-        } else {
-            //frameNumber = atoi(frameArg);
-            sprintf(frameArg,"%i",frameNumber);
-            strcpy(image, imageName);
-            strcat(image, frameArg);
-            strcat(image, imageExt);
-        }
-
-        printf("%s\n", image);
-
-        BITMAPINFOHEADER bitmapInfoHeader;
-
-        LoadBitmapFileProperties(image, &bitmapInfoHeader);
-        width = bitmapInfoHeader.biWidth;
-        height = bitmapInfoHeader.biHeight;
-        rgb_channels = bitmapInfoHeader.biBitCount/8;
-
-        if (initiated == 0)
-        {
-            init_pr_computation(width, height, rgb_channels);
-            initiated = 1;
-        }
-
-        rgb = load_frame(image, width, height, rgb_channels);
-
-        const size_t y_stride = width + (16-width%16)%16;
-        const size_t uv_stride = y_stride;
-        const size_t rgb_stride = width*3 +(16-(3*width)%16)%16;
-        
-        rgb24_yuv420_std(width, height, rgb, rgb_stride, y, u, v, y_stride, uv_stride, YCBCR_601);
-        
-        int position = (frameNumber-1)%BUFF_SIZE;
-
-        lhe_advanced_compute_perceptual_relevance (y, pr_x_buff[position], pr_y_buff[position]);
-
-        
-
-        //pr_x_buff[position] = pr_x;
-        //pr_y_buff[position] = pr_y;
-
-        pr_to_movement(position);
-        float movement = get_image_movement(0);
-
-        fprintf( stderr, "%f\n", movement);
-
-        //printf("MOVEMENT: %f frame: %d\n", movement, frameNumber);
-
-        create_frame();
-
-        char frameName[100];
-        sprintf(frameName,"./output/output%i.bmp",frameNumber);
-        //printf("Frame name: %s\n", frameName);
-        yuv420_rgb24_std(width, height, y, u, v, y_stride, uv_stride, rec_rgb, rgb_stride, YCBCR_601);
-        stbi_write_bmp(frameName, width, height, rgb_channels, rec_rgb);
-
-
+    if (draw_bar)
+    {
+        movement = get_image_movement(1);
+        draw_movement_bar(movement);
     }
 
-
-/*
-    printf("total_blocks_height = %d, total_blocks_width = %d\n", total_blocks_height, total_blocks_width);
-
-    float pr_recuperada[total_blocks_height+1];
-
-    for(int i = 0; i < total_blocks_height+1; i++){
-        fwrite(&pr_x[i], sizeof(float), total_blocks_width, f);
-        for (int a = 0; a < total_blocks_width+1; a++){
-            printf("PRx[%d][%d] = %f\n", i,a, pr_x[i][a] );
-        }
-    }
-
-    fseek(f, 0, SEEK_SET);
-
-    int elem = fread(pr_recuperada, sizeof(float), total_blocks_width, f);
-    printf("numero de elementos recuperados: %d\n", elem);
-    for (int a = 0; a < total_blocks_width; a++){
-        printf("pr_recuperada[%d] = %f\n", a, pr_recuperada[a]);
-    }
-    
-    fclose(f);
-*/
-
-
-
-    close_pr_computation();
-
-    return 0;
 }

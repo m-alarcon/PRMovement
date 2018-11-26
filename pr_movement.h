@@ -35,6 +35,8 @@
 #define QUANT_LUM2 32//24
 #define QUANT_LUM3 80//72
 
+#define BUFF_SIZE 5
+
 typedef struct BasicLheBlock {
     uint32_t block_width;
     uint32_t block_height;
