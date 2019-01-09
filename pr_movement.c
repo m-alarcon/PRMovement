@@ -503,9 +503,9 @@ void paint_block(int block_x, int block_y, int color)
     int yini = block_y*theoretical_block_height;
     int yfin = yini+theoretical_block_height;
 
-    if (xfin > width-1-theoretical_block_width)
+    if (xfin > width-theoretical_block_width)
         xfin = width;
-    if (yfin > height-1-theoretical_block_height)
+    if (yfin > height-theoretical_block_height)
         yfin = height;
 
     for (int xx = xini; xx < xfin; xx++){
