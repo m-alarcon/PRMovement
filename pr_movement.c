@@ -154,6 +154,10 @@ void close_pr_computation()
         
     for (int i=0; i < buff_size; i++)
     {    
+        for (int j=0; j<total_blocks_height+1; j++) 
+        {
+            free(pr_x_buff[i][j]);
+        }
         free (pr_x_buff[i]);
     }
 
@@ -161,6 +165,10 @@ void close_pr_computation()
     
     for (int i=0; i < buff_size; i++)
     {
+        for (int j=0; j<total_blocks_height+1; j++) 
+        {
+            free (pr_y_buff[i][j]);
+        }
         free (pr_y_buff[i]);
     }
 
