@@ -18,6 +18,8 @@ int main( int argc, char** argv )
     buff_size = BUFF_SIZE;
 
     float mov_aux = 0;
+    struct timeval  tv1, tv2;
+    double time = 0;
 
     for (frameNumber = 1; frameNumber < frame; frameNumber++){
 
@@ -58,6 +60,8 @@ int main( int argc, char** argv )
         
         int position = (frameNumber-1)%buff_size;
 
+gettimeofday(&tv1, NULL);
+
         lhe_advanced_compute_perceptual_relevance (y, pr_x_buff[position], pr_y_buff[position]);
 
         //pr_x_buff[position] = pr_x;
@@ -80,6 +84,9 @@ int main( int argc, char** argv )
         fprintf( stderr, "%f\n", movement);
         
 
+gettimeofday(&tv2, NULL);        
+
+time += (double) (tv2.tv_usec - tv1.tv_usec);
         //printf("MOVEMENT: %f frame: %d\n", movement, frameNumber);
 
         create_frame(1);
@@ -93,6 +100,7 @@ int main( int argc, char** argv )
 
     }
 
+printf("Time spent on compute movement: %f useconds\n", time/frame);
     close_pr_computation();
 
     return 0;

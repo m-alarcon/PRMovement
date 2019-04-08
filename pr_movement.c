@@ -373,7 +373,7 @@ void lhe_advanced_compute_perceptual_relevance (uint8_t *component_original_data
     half_block_width = (block_width >>1);
     half_block_height = (block_width >>1);
 
-    //#pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static)
     for (int block_y=0; block_y<total_blocks_height+1; block_y++)      
     {
         for (int block_x=0; block_x<total_blocks_width+1; block_x++) 
