@@ -470,7 +470,7 @@ float get_image_movement(int mode)
             }
         }
         pr_avg /= ((total_blocks_width+1)*(total_blocks_height+1));
-
+        
         for (int i = 0; i < total_blocks_width + 1; i++){
             for (int j = 0; j < total_blocks_height + 1; j++){
                 sd += pow(((diffs_x[j][i] + diffs_y[j][i])/2) - pr_avg, 2);
