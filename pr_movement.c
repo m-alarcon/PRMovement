@@ -454,14 +454,29 @@ float get_image_movement(int mode)
     float accum = 0;
     float accum_x = 0, accum_y = 0;
 
+    float aux = 0;
+    float pr_avg = 0;
+    float sd = 0;
+
+    float arr[(total_blocks_width+1)*(total_blocks_height+1)];
+    int pos = 0;
+
     if (mode == 0){//Average measurement
 
         for (int i = 0; i < total_blocks_width + 1; i++){
             for (int j = 0; j < total_blocks_height + 1; j++){
-                accum += (diffs_x[j][i] + diffs_y[j][i])/2;
+                pr_avg += (diffs_x[j][i] + diffs_y[j][i])/2;
+
             }
         }
-        accum /= ((total_blocks_width+1)*(total_blocks_height+1));
+        pr_avg /= ((total_blocks_width+1)*(total_blocks_height+1));
+
+        for (int i = 0; i < total_blocks_width + 1; i++){
+            for (int j = 0; j < total_blocks_height + 1; j++){
+                sd += pow(((diffs_x[j][i] + diffs_y[j][i])/2) - pr_avg, 2);
+            }
+        }
+        accum = sqrt(sd/((total_blocks_width+1)*(total_blocks_height+1)));
     
     } else if (mode == 1) {//Maximum avg measurement PRx or PRy
 
@@ -571,7 +586,7 @@ void create_frame(int draw_bar)
     }
     if (draw_bar)
     {
-        movement = get_image_movement(1);
+        movement = get_image_movement(0);
         draw_movement_bar(movement);
     }
 

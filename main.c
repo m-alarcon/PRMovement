@@ -17,6 +17,8 @@ int main( int argc, char** argv )
     initiated = 0;
     buff_size = BUFF_SIZE;
 
+    float mov_aux = 0;
+
     for (frameNumber = 1; frameNumber < frame; frameNumber++){
 
         if (frameArg == NULL){
@@ -58,15 +60,25 @@ int main( int argc, char** argv )
 
         lhe_advanced_compute_perceptual_relevance (y, pr_x_buff[position], pr_y_buff[position]);
 
-        
-
         //pr_x_buff[position] = pr_x;
         //pr_y_buff[position] = pr_y;
 
         pr_to_movement(position);
         float movement = get_image_movement(0);
 
+        //Test of GOP movements
+/*
+        if (frameNumber != 1)
+            mov_aux += movement;
+
+        if (frameNumber%4 == 0){
+            mov_aux /= 4;
+            fprintf( stderr, "%f\n", mov_aux);
+            mov_aux = 0;
+        }
+*/
         fprintf( stderr, "%f\n", movement);
+        
 
         //printf("MOVEMENT: %f frame: %d\n", movement, frameNumber);
 
